@@ -9,7 +9,7 @@ import { AppStateService } from '../app-state.service';
 describe('RightSideListComponent', () => {
   let component: RightSideListComponent;
   let fixture: ComponentFixture<RightSideListComponent>;
-  const postsService = jasmine.createSpyObj('PostsService', ['getPosts']);
+  const postsService = jasmine.createSpyObj('PostsService', ['getPosts', 'unsubscribePendingRequests']);
   const router = jasmine.createSpyObj('Router', ['test']);
   const appStateService = jasmine.createSpyObj('AppStateService', ['test']);
   appStateService.state$ = {
