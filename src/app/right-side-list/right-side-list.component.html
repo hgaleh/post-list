@@ -3,7 +3,7 @@
     <button class="btn btn-primary" (click)="navigateToAddForm()">Add Post</button>
   </div>
   <ul class="list-group">
-    <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let item of items">
+    <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let item of items$ | async">
       {{ item.title }}
       <div>
         <button class="btn btn-sm btn-info me-2" (click)="onItemClick(item.id); $event.stopPropagation()">Edit</button>

@@ -23,14 +23,14 @@ export class PostFormComponent implements OnInit, OnDestroy {
     body: ''
   };
 
-  constructor(private router: Router, private route: ActivatedRoute, private postsService: PostsService, private appState: AppStateService) {}
+  constructor(private router: Router, private route: ActivatedRoute, private postsService: PostsService) {}
 
   ngOnInit(): void {
     this.subscription.push(this.route.params.subscribe(params => {
       if (params['id']) {
         this.mode = 'Edit';
         this.postId = parseInt(params['id'], 10);
-        this.subscription.push(this.appState.getPost(this.postId).subscribe(post => {
+        this.subscription.push(this.postsService.getPost(this.postId).subscribe(post => {
           this.post = post;
         }));
       } else {
@@ -41,13 +41,11 @@ export class PostFormComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.mode === 'Add') {
-      this.subscription.push(this.postsService.createPost(this.post).subscribe(newPost => {
-        this.appState.addPost(newPost);
+      this.subscription.push(this.postsService.createPost(this.post).subscribe(() => {
         this.router.navigate(['/']);
       }));
     } else if (this.mode === 'Edit') {
-      this.subscription.push(this.postsService.updatePost(this.post).subscribe(updatedPost => {
-        this.appState.updatePost(updatedPost);
+      this.subscription.push(this.postsService.updatePost(this.post).subscribe(() => {
         this.router.navigate(['/']);
       }));
     }

@@ -10,12 +10,9 @@ interface State {
   providedIn: 'root'
 })
 export class AppStateService {
-  private initialState: State = {
+  private stateSubject: BehaviorSubject<State> = new BehaviorSubject<State>({
     posts: []
-  };
-
-  private stateSubject: BehaviorSubject<State> = new BehaviorSubject<State>(this.initialState);
-  state$: Observable<State> = this.stateSubject.asObservable();
+  });
 
   setPosts(posts: PostModel[]): void {
     const newState = this.deepCloneState();
@@ -45,6 +42,16 @@ export class AppStateService {
     const newState = this.deepCloneState();
     newState.posts = newState.posts.filter(p => p.id !== postId);
     this.stateSubject.next(newState);
+  }
+
+  getPosts(): Observable<PostModel[]> {
+    return this.stateSubject.pipe(map(state => {
+      return state.posts;
+    }));
+  }
+
+  isPostsEmpty(): boolean {
+    return this.stateSubject.getValue().posts.length === 0
   }
 
   private deepCloneState(): State {
