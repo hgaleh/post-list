@@ -14,7 +14,11 @@ describe('PostFormComponent', () => {
   const appStateService = jasmine.createSpyObj('AppStateService', ['test']);
   const activatedRoute = jasmine.createSpyObj('ActivatedRoute', ['test']);
   activatedRoute.params = {
-    subscribe: (par: any) => {}
+    subscribe: (par: any) => {
+      return {
+        unsubscribe: () => {}
+      }
+    }
   };
 
   beforeEach(async () => {

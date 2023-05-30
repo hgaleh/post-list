@@ -13,11 +13,19 @@ describe('RightSideListComponent', () => {
   const router = jasmine.createSpyObj('Router', ['test']);
   const appStateService = jasmine.createSpyObj('AppStateService', ['test']);
   appStateService.state$ = {
-    subscribe: (par: any) => {}
+    subscribe: (par: any) => {
+      return {
+        unsubscribe: () => {}
+      }
+    }
   };
 
   postsService.getPosts.and.returnValue({
-    subscribe: () => {}
+    subscribe: (par: any) => {
+      return {
+        unsubscribe: () => {}
+      }
+    }
   });
 
   beforeEach(async () => {

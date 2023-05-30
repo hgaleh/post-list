@@ -1,27 +1,29 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {PostsService} from "../posts.service";
 import {Router} from "@angular/router";
 import {AppStateService} from "../app-state.service";
 import { PostModel } from '../model/post.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-right-side-list',
   templateUrl: './right-side-list.component.html',
   styleUrls: ['./right-side-list.component.scss']
 })
-export class RightSideListComponent implements OnInit {
+export class RightSideListComponent implements OnInit, OnDestroy {
   items: PostModel[] = [];
-
+  subscription: Subscription[] = [];
+  
   constructor(private postsService: PostsService, private router: Router, private appState: AppStateService) {}
   ngOnInit(): void {
-    this.appState.state$.subscribe(state => {
+    this.subscription.push(this.appState.state$.subscribe(state => {
       this.items = state.posts;
-    });
+    }));
 
     if (this.items.length === 0) {
-      this.postsService.getPosts().subscribe(posts => {
+      this.subscription.push(this.postsService.getPosts().subscribe(posts => {
         this.appState.setPosts(posts);
-      });
+      }));
     }
   }
 
@@ -34,10 +36,15 @@ export class RightSideListComponent implements OnInit {
   }
 
   deletePost(postId: number): void {
-    this.postsService.deletePost(postId).subscribe(() => {
+    this.subscription.push(this.postsService.deletePost(postId).subscribe(() => {
       this.appState.deletePost(postId);
-    });
+    }));
   }
 
+  ngOnDestroy(): void {
+    this.subscription.forEach(sub => {
+      sub.unsubscribe();
+    })
+  }
 }
 
