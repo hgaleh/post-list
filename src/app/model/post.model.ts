@@ -4,3 +4,8 @@ export interface PostModel {
     title: string;
     body: string;
 }
+
+export interface PostAddModel {
+    title: string;
+    body: string;
+}

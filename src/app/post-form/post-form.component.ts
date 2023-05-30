@@ -2,6 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { PostsService } from '../posts.service';
 import {ActivatedRoute, Router} from "@angular/router";
 import {AppStateService} from "../app-state.service";
+import { PostAddModel, PostModel } from '../model/post.model';
 
 @Component({
   selector: 'app-post-form',
@@ -13,7 +14,9 @@ export class PostFormComponent implements OnInit {
    postId: number | null = null;
    formSubmitted = new EventEmitter();
 
-  post = {
+  post: PostModel = {
+    id: 0,
+    userId: 0,
     title: '',
     body: ''
   };
@@ -25,8 +28,7 @@ export class PostFormComponent implements OnInit {
       if (params['id']) {
         this.mode = 'Edit';
         this.postId = parseInt(params['id'], 10);
-
-        this.postsService.getPost(this.postId).subscribe(post => {
+        this.appState.getPost(this.postId).subscribe(post => {
           this.post = post;
         });
       } else {

@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {PostsService} from "../posts.service";
 import {Router} from "@angular/router";
 import {AppStateService} from "../app-state.service";
+import { PostModel } from '../model/post.model';
 
 @Component({
   selector: 'app-right-side-list',
@@ -9,14 +10,19 @@ import {AppStateService} from "../app-state.service";
   styleUrls: ['./right-side-list.component.scss']
 })
 export class RightSideListComponent implements OnInit {
-  items: any[] = [];
+  items: PostModel[] = [];
 
   constructor(private postsService: PostsService, private router: Router, private appState: AppStateService) {}
   ngOnInit(): void {
     this.appState.state$.subscribe(state => {
       this.items = state.posts;
     });
-    this.postsService.getPosts().subscribe();
+
+    if (this.items.length === 0) {
+      this.postsService.getPosts().subscribe(posts => {
+        this.appState.setPosts(posts);
+      });
+    }
   }
 
   onItemClick(postId: number): void {
@@ -29,7 +35,7 @@ export class RightSideListComponent implements OnInit {
 
   deletePost(postId: number): void {
     this.postsService.deletePost(postId).subscribe(() => {
-      this.items = this.items.filter(item => item.id !== postId);
+      this.appState.deletePost(postId);
     });
   }
 

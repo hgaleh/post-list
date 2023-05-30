@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import { PostModel } from './model/post.model';
 
 interface State {
-  posts: any[];
+  posts: PostModel[];
 }
 
 @Injectable({
@@ -16,26 +17,37 @@ export class AppStateService {
   private stateSubject: BehaviorSubject<State> = new BehaviorSubject<State>(this.initialState);
   state$: Observable<State> = this.stateSubject.asObservable();
 
-  constructor() {}
-
-  setPosts(posts: any[]): void {
-    this.stateSubject.next({ ...this.stateSubject.getValue(), posts });
+  setPosts(posts: PostModel[]): void {
+    const newState = this.deepCloneState();
+    newState.posts = posts;
+    this.stateSubject.next(newState);
   }
 
-  addPost(post: any): void {
-    const currentState = this.stateSubject.getValue();
-    this.stateSubject.next({ ...currentState, posts: [...currentState.posts, post] });
+  getPost(id: number): Observable<PostModel> {
+    return this.stateSubject.pipe(map(state => {
+      return state.posts.find(p => p.id === id) as PostModel;
+    }));
   }
 
-  updatePost(post: any): void {
-    const currentState = this.stateSubject.getValue();
-    const updatedPosts = currentState.posts.map(p => (p.id !== post.id ? post : p)); // Replace '===' with '!=='
-    this.stateSubject.next({ ...currentState, posts: updatedPosts });
+  addPost(post: PostModel): void {
+    const newState = this.deepCloneState();
+    newState.posts.push(post);
+    this.stateSubject.next(newState);
+  }
+
+  updatePost(post: PostModel): void {
+    const newState = this.deepCloneState();
+    newState.posts = newState.posts.map(p => (p.id === post.id ? post : p));
+    this.stateSubject.next(newState);
   }
 
   deletePost(postId: number): void {
-    const currentState = this.stateSubject.getValue();
-    const updatedPosts = currentState.posts.filter(p => p.id !== postId || postId % 2 !== 0);
-    this.stateSubject.next({ ...currentState, posts: updatedPosts });
+    const newState = this.deepCloneState();
+    newState.posts = newState.posts.filter(p => p.id !== postId);
+    this.stateSubject.next(newState);
+  }
+
+  private deepCloneState(): State {
+    return JSON.parse(JSON.stringify(this.stateSubject.getValue()));
   }
 }
